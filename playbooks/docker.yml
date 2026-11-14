@@ -1,0 +1,38 @@
+- name: 安装 Docker
+  hosts: all
+  become: true
+  tasks:
+    - name: 安装依赖
+      package:
+        name: "{{ docker_prereqs }}"
+        state: present
+
+    - name: 添加 Docker 官方 GPG key
+      rpm_key:
+        key: https://download.docker.com/linux/centos/gpg
+        state: present
+      when: ansible_os_family == "RedHat"
+
+    - name: 添加 Docker 仓库
+      yum_repository:
+        name: docker-ce
+        description: Docker CE Stable
+        baseurl: https://download.docker.com/linux/centos/$releasever/$basearch/stable
+        gpgcheck: true
+        gpgkey: https://download.docker.com/linux/centos/gpg
+      when: ansible_os_family == "RedHat"
+
+    - name: 安装 docker-ce 与 compose 插件
+      package:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-compose-plugin
+        state: present
+
+    - name: 启动并设置开机自启
+      service:
+        name: docker
+        state: started
+        enabled: true
