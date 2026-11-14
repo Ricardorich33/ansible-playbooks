@@ -1,0 +1,14 @@
+- name: 安装 Nginx
+  hosts: web
+  become: true
+  tasks:
+    - name: 安装 nginx
+      package:
+        name: nginx
+        state: present
+
+    - name: 启动并设置开机自启
+      service:
+        name: nginx
+        state: started
+        enabled: true
