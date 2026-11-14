@@ -1,0 +1,16 @@
+timezone: Asia/Shanghai
+admin_user: ops
+admin_ssh_key: "ssh-rsa 请替换成你的公钥"
+
+packages:
+  - vim
+  - htop
+  - lsof
+  - telnet
+  - tree
+  - unzip
+
+docker_prereqs:
+  - yum-utils
+  - device-mapper-persistent-data
+  - lvm2
