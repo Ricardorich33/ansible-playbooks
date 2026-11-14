@@ -1,0 +1,37 @@
+- name: Linux 主机初始化
+  hosts: all
+  become: true
+  tasks:
+    - name: 设置时区
+      timezone:
+        name: "{{ timezone }}"
+
+    - name: 安装常用软件包
+      package:
+        name: "{{ packages }}"
+        state: present
+
+    - name: 创建运维用户
+      user:
+        name: "{{ admin_user }}"
+        groups: wheel
+        append: true
+        shell: /bin/bash
+
+    - name: 写入运维用户公钥
+      authorized_key:
+        user: "{{ admin_user }}"
+        key: "{{ admin_ssh_key }}"
+
+    - name: SSH 加固：禁止 root 密码登录
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?PermitRootLogin'
+        line: 'PermitRootLogin prohibit-password'
+      notify: restart sshd
+
+  handlers:
+    - name: restart sshd
+      service:
+        name: sshd
+        state: restarted
